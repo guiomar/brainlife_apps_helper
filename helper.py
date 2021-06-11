@@ -285,4 +285,8 @@ def define_kwargs(config):
     if '_app' and '_tid' and '_inputs' and '_outputs' in config.keys():
         del config['_app'], config['_tid'], config['_inputs'], config['_outputs'] 
 
+    # When you run a pipeline rule, another key appeers
+    if "_rule" in config.keys():
+        del config['_rule'] 
+
     return config
