@@ -353,7 +353,6 @@ def create_meg_json(data):
 
     # Create dictionary
     with open(meg_json_file) as meg_json:
-        meg_json = json.load(meg_json_file)
+        dict_meg_json = json.load(meg_json)
 
-    return meg_json
-
+    return dict_meg_json
