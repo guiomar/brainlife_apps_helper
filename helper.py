@@ -19,7 +19,7 @@ def convert_parameters_to_None(config):
 
     Returns
     -------
-    config:  
+    config: dict 
         Dictionary with parameters converted to None where needed.   
 
     """
@@ -43,8 +43,23 @@ def read_optional_files(config, out_dir_name):
 
     Returns
     -------
-    config:  
+    config: dict 
         Dictionary with parameters minus the optional files entries.  
+    cross_talk_file: str or None
+        Path to the FIF file with cross-talk correction information.
+    calibration_file: str or None
+        Path to the '.dat' file with fine calibration coefficients. This file is machine/site-specific.
+    events_file: str or None
+        Path to the '.tsv' BIDS compliant file containing events.
+    head_pos_file: str or None
+        Path to the '.pos' file containing the info to perform movement compensation.
+    channels_file: str or None
+        Path to the '.tsv' file containing channel info.
+    destination: str or None
+        Path to the FIF file containing the destination location for the head.
+    meg_json_file: str or None
+        Path to the json file containg signal and preprocessing info.
+
     """
 
     # From meg/fif datatype #
@@ -70,6 +85,17 @@ def read_optional_files(config, out_dir_name):
                 shutil.copy2(calibration_file, os.path.join(out_dir_name, 'calibration_meg.dat'))  
     else:
         calibration_file = None
+
+    # Read the meg json file
+    if 'meg_json' in config.keys():
+        meg_json_file = config.pop('meg_json')
+        if meg_json_file is not None:
+            if os.path.exists(meg_json_file) is False:
+                meg_json_file = None
+            else:
+                shutil.copy2(meg_json_file, os.path.join(out_dir_name, 'meg.json'))  
+    else:
+        meg_json_file = None
     
     # Read the events file
     # We don't copy this file in outdir yet because this file can be given in fif-override 
@@ -166,7 +192,7 @@ def read_optional_files(config, out_dir_name):
             shutil.copy2(events_file_override, os.path.join(out_dir_name, 'events.tsv'))  # required to run a pipeline on BL
             events_file = events_file_override
     
-    return config, cross_talk_file, calibration_file, events_file, head_pos_file, channels_file, destination
+    return config, cross_talk_file, calibration_file, events_file, head_pos_file, channels_file, destination, meg_json_file
 
 
 def update_data_info_bads(data, channels_file): 
@@ -290,3 +316,43 @@ def define_kwargs(config):
         del config['_rule'] 
 
     return config
+
+
+def create_meg_json(data):
+    """Create the sidecar meg.json that contains info on the data and on the preprocessing.
+
+    Parameters
+    ----------
+    data: instance of mne.io.Raw or instance of mne.Epochs
+        Data from which the meg.json is created.
+
+
+    meg_json: dict
+        Dictionary containing the data info in a BIDS compliant way.
+    """
+
+    # Create a BIDSPath
+    bids_path = BIDSPath(subject='subject',
+                         session=None,
+                         task='task',
+                         run='01',
+                         acquisition=None,
+                         processing=None,
+                         recording=None,
+                         space=None,
+                         suffix=None,
+                         datatype='meg',
+                         root='bids')
+
+    # Write BIDS to create channels.tsv BIDS compliant
+    write_raw_bids(data, bids_path, overwrite=True)
+
+    # Extract meg.json from bids path
+    meg_json_file = 'bids/sub-subject/meg/sub-subject_task-task_run-01_meg.json'
+
+    # Create dictionary
+    with open(meg_json_file) as meg_json:
+        meg_json = json.load(meg_json_file)
+
+    return meg_json
+
