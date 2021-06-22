@@ -7,6 +7,7 @@ import numpy as np
 import os
 import shutil
 import pandas as pd
+from mne_bids import BIDSPath, write_raw_bids
 
 
 def convert_parameters_to_None(config):
