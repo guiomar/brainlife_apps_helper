@@ -158,6 +158,11 @@ def read_optional_files(config, out_dir_name):
             # By default we copy the files given in input of meg/fif-override 
             shutil.copy2(destination_override, os.path.join(out_dir_name, 'destination.fif'))  # required to run a pipeline on BL 
             destination = destination_override  # we overwrite the value of destination
+    else: 
+        # If the App has no meg/override-datatype (or if the App is run locally) 
+        if destination is not None:
+            # If destination file from meg/fif is not None, we copy it in outdir
+            shutil.copy2(destination, os.path.join(out_dir_name, 'destination.fif'))
 
     # Read head pos file
     if 'headshape_override' in config.keys():
@@ -170,6 +175,10 @@ def read_optional_files(config, out_dir_name):
         else:
             shutil.copy2(head_pos_file_override, os.path.join(out_dir_name, 'headshape.pos')) 
             head_pos_file = mne.chpi.read_head_pos(head_pos_file_override)
+    else:
+        if head_pos_file is not None:
+            shutil.copy2(head_pos_file, os.path.join(out_dir_name, 'headshape.pos'))  
+            head_pos_file = mne.chpi.read_head_pos(head_pos_file)
 
     # Read channels file
     if 'channels_override' in config.keys():
@@ -181,6 +190,9 @@ def read_optional_files(config, out_dir_name):
         else:
             shutil.copy2(channels_file_override, os.path.join(out_dir_name, 'channels.tsv'))
             channels_file = channels_file_override
+    else:
+        if channels_file is not None:
+            shutil.copy2(channels_file, os.path.join(out_dir_name, 'channels.tsv'))       
         
     # Read the events file
     if "events_override" in config.keys():
@@ -192,6 +204,9 @@ def read_optional_files(config, out_dir_name):
         else:
             shutil.copy2(events_file_override, os.path.join(out_dir_name, 'events.tsv'))  # required to run a pipeline on BL
             events_file = events_file_override
+    else:
+        if events_file is not None:
+            shutil.copy2(events_file, os.path.join(out_dir_name, 'events.tsv'))        
     
     return config, cross_talk_file, calibration_file, events_file, head_pos_file, channels_file, destination, meg_json_file
 
@@ -318,41 +333,3 @@ def define_kwargs(config):
 
     return config
 
-
-def create_meg_json(data):
-    """Create the sidecar meg.json that contains info on the data and on the preprocessing.
-
-    Parameters
-    ----------
-    data: instance of mne.io.Raw or instance of mne.Epochs
-        Data from which the meg.json is created.
-
-
-    meg_json: dict
-        Dictionary containing the data info in a BIDS compliant way.
-    """
-
-    # Create a BIDSPath
-    bids_path = BIDSPath(subject='subject',
-                         session=None,
-                         task=None,
-                         run='01',
-                         acquisition=None,
-                         processing=None,
-                         recording=None,
-                         space=None,
-                         suffix=None,
-                         datatype='meg',
-                         root='bids')
-
-    # Write BIDS to create channels.tsv BIDS compliant
-    write_raw_bids(data, bids_path, overwrite=True)
-
-    # Extract meg.json from bids path
-    meg_json_file = 'bids/sub-subject/meg/sub-subject_run-01_meg.json'
-
-    # Create dictionary
-    with open(meg_json_file) as meg_json:
-        dict_meg_json = json.load(meg_json)
-
-    return dict_meg_json
