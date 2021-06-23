@@ -206,7 +206,8 @@ def read_optional_files(config, out_dir_name):
             events_file = events_file_override
     else:
         if events_file is not None:
-            shutil.copy2(events_file, os.path.join(out_dir_name, 'events.tsv'))        
+            shutil.copy2(events_file, os.path.join(out_dir_name, 'events.tsv'))     
+            print('aaaaa')   
     
     return config, cross_talk_file, calibration_file, events_file, head_pos_file, channels_file, destination, meg_json_file
 
