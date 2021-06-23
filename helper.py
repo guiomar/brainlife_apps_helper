@@ -205,9 +205,9 @@ def read_optional_files(config, out_dir_name):
             shutil.copy2(events_file_override, os.path.join(out_dir_name, 'events.tsv'))  # required to run a pipeline on BL
             events_file = events_file_override
     else:
+        print(events_file)
         if events_file is not None:
-            shutil.copy2(events_file, os.path.join(out_dir_name, 'events.tsv'))     
-            print('aaaaa')   
+            shutil.copy2(events_file, os.path.join(out_dir_name, 'events.tsv'))       
     
     return config, cross_talk_file, calibration_file, events_file, head_pos_file, channels_file, destination, meg_json_file
 
