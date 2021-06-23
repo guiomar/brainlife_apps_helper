@@ -335,7 +335,7 @@ def create_meg_json(data):
     # Create a BIDSPath
     bids_path = BIDSPath(subject='subject',
                          session=None,
-                         task='task',
+                         task=None,
                          run='01',
                          acquisition=None,
                          processing=None,
@@ -349,7 +349,7 @@ def create_meg_json(data):
     write_raw_bids(data, bids_path, overwrite=True)
 
     # Extract meg.json from bids path
-    meg_json_file = 'bids/sub-subject/meg/sub-subject_task-task_run-01_meg.json'
+    meg_json_file = 'bids/sub-subject/meg/sub-subject_run-01_meg.json'
 
     # Create dictionary
     with open(meg_json_file) as meg_json:
