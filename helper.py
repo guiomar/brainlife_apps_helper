@@ -57,8 +57,6 @@ def read_optional_files(config, out_dir_name):
         Path to the '.tsv' file containing channel info.
     destination: str or None
         Path to the FIF file containing the destination location for the head.
-    meg_json_file: str or None
-        Path to the json file containg signal and preprocessing info.
 
     """
 
@@ -85,17 +83,6 @@ def read_optional_files(config, out_dir_name):
                 shutil.copy2(calibration_file, os.path.join(out_dir_name, 'calibration_meg.dat'))  
     else:
         calibration_file = None
-
-    # Read the meg json file
-    if 'meg_json' in config.keys():
-        meg_json_file = config.pop('meg_json')
-        if meg_json_file is not None:
-            if os.path.exists(meg_json_file) is False:
-                meg_json_file = None
-            else:
-                shutil.copy2(meg_json_file, os.path.join(out_dir_name, 'meg.json'))  
-    else:
-        meg_json_file = None
     
     # Read the events file
     # We don't copy this file in outdir yet because this file can be given in fif-override 
@@ -207,7 +194,7 @@ def read_optional_files(config, out_dir_name):
         if events_file is not None:
             shutil.copy2(events_file, os.path.join(out_dir_name, 'events.tsv'))       
     
-    return config, cross_talk_file, calibration_file, events_file, head_pos_file, channels_file, destination, meg_json_file
+    return config, cross_talk_file, calibration_file, events_file, head_pos_file, channels_file, destination
 
 
 def update_data_info_bads(data, channels_file): 
