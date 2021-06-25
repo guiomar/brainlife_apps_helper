@@ -7,7 +7,6 @@ import numpy as np
 import os
 import shutil
 import pandas as pd
-from mne_bids import BIDSPath, write_raw_bids
 
 
 def convert_parameters_to_None(config):
@@ -159,7 +158,7 @@ def read_optional_files(config, out_dir_name):
             shutil.copy2(destination_override, os.path.join(out_dir_name, 'destination.fif'))  # required to run a pipeline on BL 
             destination = destination_override  # we overwrite the value of destination
     else: 
-        # If the App has no meg/override-datatype (or if the App is run locally) 
+        # If the App has no meg/override datatype (or if the App is run locally) 
         if destination is not None:
             # If destination file from meg/fif is not None, we copy it in outdir
             shutil.copy2(destination, os.path.join(out_dir_name, 'destination.fif'))
@@ -205,7 +204,6 @@ def read_optional_files(config, out_dir_name):
             shutil.copy2(events_file_override, os.path.join(out_dir_name, 'events.tsv'))  # required to run a pipeline on BL
             events_file = events_file_override
     else:
-        print(events_file)
         if events_file is not None:
             shutil.copy2(events_file, os.path.join(out_dir_name, 'events.tsv'))       
     
