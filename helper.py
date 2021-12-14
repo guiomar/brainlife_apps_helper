@@ -173,12 +173,15 @@ def read_optional_files(config, out_dir_name):
         if os.path.exists(channels_file_override) is False:
             if channels_file is not None:
                 shutil.copy2(channels_file, os.path.join(out_dir_name, 'channels.tsv'))
+                os.chmod(os.path.join(out_dir_name, 'channels.tsv'), 775) # chmod u=rwx,g=rwx,o=rx  | chmod 775 |
         else:
             shutil.copy2(channels_file_override, os.path.join(out_dir_name, 'channels.tsv'))
+            os.chmod(os.path.join(out_dir_name, 'channels.tsv'), 775) # chmod u=rwx,g=rwx,o=rx  | chmod 775 |
             channels_file = channels_file_override
     else:
         if channels_file is not None:
-            shutil.copy2(channels_file, os.path.join(out_dir_name, 'channels.tsv'))       
+            shutil.copy2(channels_file, os.path.join(out_dir_name, 'channels.tsv'))
+            os.chmod(os.path.join(out_dir_name, 'channels.tsv'), 775) # chmod u=rwx,g=rwx,o=rx  | chmod 775 |       
         
     # Read the events file
     if "events_override" in config.keys():
